@@ -3,11 +3,12 @@
 
 # benötigte Pakete
 library(rgbif)
-library(data.table)
 library(sf)
 library(ggplot2)
+library(data.table)
 library(rnaturalearth)
 library(rnaturalearthdata)
+library(mapview)
 
 # wir laden FloraWeb-Daten aus GBIF.
 # dafür müssen wir uns den datasetKey aus GBIF heraussuchen: e6fab7b3-c733-40b9-8df3-2a03e49532c1 oder wir nutzen den institutionCode="BfN"
@@ -56,17 +57,11 @@ p <- p +  ggtitle("Quadranten mit Draba aizoides")
 p
 
 
-library("maptiles")
-library(tidyterra)
+# interaktive Karte
 
-sat <- get_tiles(germany, provider = "Esri.WorldImagery", crop = TRUE)
+# Interaktive Karte mit mapview erstellen
+mapview(Draba_aizoides_sf[,"locality"], map.types="OpenStreetMap", col.regions="darkblue", label =NA, legend=FALSE)
 
-p <- ggplot(germany)  
-p <- p +  geom_spatraster_rgb(data  = sat)
-p <- p +  geom_sf(data=Draba_aizoides_sf, aes()) 
-p <- p + geom_sf(data=germany, fill = NA, color = "white")
-p <- p +  ggtitle("Quadranten mit Draba aizoides")
-p
 
 
 ## zweiter Versuch mit der Hirschzunge
@@ -81,7 +76,7 @@ keys
 # vergleich: https://www.gbif.org/species/2650669
 
 
-# auslesen der Daten aus GBIF. Für Borstgrasrasen dauert das sehr lange. 
+# auslesen der Daten aus GBIF. 
 gbif_species <- occ_data(taxonKey =keys, country="DE", hasCoordinate = TRUE, limit = 10000, datasetKey="e6fab7b3-c733-40b9-8df3-2a03e49532c1")
 
 Asplenium_scolopendrium <- as.data.frame(gbif_species$data)
@@ -102,6 +97,11 @@ p <- p +  ggtitle("Quadranten mit Asplenium scolopendrium")
 p
 
 
+# Interaktive Karte mit mapview erstellen
+mapview(Asplenium_scolopendrium_sf[,"locality"], map.types="OpenStreetMap", col.regions="darkblue", label =NA, legend=FALSE)
+
+
+
 ###################### Geht es auch für Pflanzengesellschaften
 
 
@@ -112,7 +112,6 @@ speclist <- c("Globularia bisnagarica", "Linum tenuifolium", "Fumana procumbens"
 #  diese Funktion soll dabei helfen die richtige Art zu finden
 keys <- vapply(speclist, function(x) name_suggest(x)$data$key[1], numeric(1), USE.NAMES=FALSE)
 keys 
-
 
 gbif_species <- occ_data(taxonKey =keys, country="DE", hasCoordinate = TRUE, limit = 10000, institutionCode="BfN")
 
@@ -165,6 +164,9 @@ p <- p +  ggtitle("Anzahl Kennarten Trespen-Trockenrasen")
 p <- p + scale_color_distiller(palette ="YlOrRd", na.value=NA,direction = 1) 
 windows(width=5, height=7)
 p
+
+# Interaktive Karte mit mapview erstellen
+mapview(df_count, map.types="OpenStreetMap", zcol="value", label =NA, legend=FALSE)
 
 
 #### Aufgabe 1:
